@@ -2,6 +2,8 @@
 
 A TypeScript SDK for controlling Feetech servo motors using Web Serial API. This library provides a modern, type-safe interface for interacting with STS, SMS, and SCS series servo motors in web browsers.
 
+Demo: https://feetech-servo-ts.vercel.app/
+
 ## Features
 
 - 🌐 **Web Serial API Integration** - Direct browser-to-servo communication
