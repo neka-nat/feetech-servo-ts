@@ -21,8 +21,8 @@ export const TORQUE_ENABLE = 1;
 export const TORQUE_DISABLE = 0;
 
 export const MIN_POSITION_VALUE = 0;
-export const MAX_POSITION_VALUE = 1023;
-export const CENTER_POSITION_VALUE = 512;
+export const MAX_POSITION_VALUE = 4095;
+export const CENTER_POSITION_VALUE = 2048;
 
 export const MIN_SPEED_VALUE = 0;
 export const MAX_SPEED_VALUE = 1023;

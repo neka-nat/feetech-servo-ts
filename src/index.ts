@@ -39,6 +39,14 @@ export class FeetechServo {
   private motors: MotorsConfig = {};
   private defaultModel: string;
 
+  private getModelByServoId(id: number): string {
+    for (const key in this.motors) {
+      const m = this.motors[key];
+      if (m.id === id) return m.model;
+    }
+    return this.defaultModel;
+  }
+
   constructor(config: FeetechServoConfig = {}) {
     const { 
       port = { baudRate: DEFAULT_BAUDRATE },
@@ -112,19 +120,22 @@ export class FeetechServo {
 
   async writePosition(id: number, position: number, speed?: number): Promise<void> {
     this.ensureConnected();
-    const clampedPosition = helpers.clampPosition(position);
+    const model = this.getModelByServoId(id);
+    const clampedPosition = helpers.clampPosition(position, model);
     const clampedSpeed = speed !== undefined ? helpers.clampSpeed(speed) : undefined;
     await this.protocolHandler.writePosition(id, clampedPosition, clampedSpeed);
   }
 
   async setPositionInDegrees(id: number, degrees: number, speed?: number): Promise<void> {
-    const position = helpers.degreesToPosition(degrees);
+    const model = this.getModelByServoId(id);
+    const position = helpers.degreesToPosition(degrees, model);
     await this.writePosition(id, position, speed);
   }
 
   async getPositionInDegrees(id: number): Promise<number> {
     const position = await this.readPosition(id);
-    return helpers.positionToDegrees(position);
+    const model = this.getModelByServoId(id);
+    return helpers.positionToDegrees(position, model);
   }
 
   async enableTorque(id: number): Promise<void> {
@@ -181,7 +192,8 @@ export class FeetechServo {
     const syncWrite = this.createSyncWrite(entry.address, entry.size);
 
     for (const item of positions) {
-      const clampedPosition = helpers.clampPosition(item.position);
+      const model = this.getModelByServoId(item.id);
+      const clampedPosition = helpers.clampPosition(item.position, model);
       const data = new Uint8Array([
         getLowByte(clampedPosition),
         getHighByte(clampedPosition)

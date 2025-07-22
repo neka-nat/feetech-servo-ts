@@ -58,11 +58,28 @@ connectBtn.addEventListener('click', async () => {
     };
     servo = new FeetechServo(config);
     await servo.connect();
-    
+
     log('Connected successfully!', 'success');
     connectionStatus.textContent = 'Connected';
     connectionStatus.className = 'status connected';
-    
+
+    const model = servo?.getMotorModel('servo1') ?? 'scs_series';
+    const maxPos = helpers.getModelMaxPosition(model);
+
+    // 個別制御
+    positionSlider.max = String(maxPos);
+    positionInput.max  = String(maxPos);
+
+    // Sync 制御
+    syncPositionSlider.max = String(maxPos);
+    syncPositionInput.max  = String(maxPos);
+
+    // ラベルも書き換え
+    const posLabel  = document.querySelector('label[for="positionSlider"]');
+    if (posLabel)  posLabel.textContent  = `Position (0‑${maxPos})`;
+    const syncLabel = document.querySelector('label[for="syncPosition"]');
+    if (syncLabel) syncLabel.textContent = `Target Position (0‑${maxPos})`;
+
     // Update button states
     connectBtn.disabled = true;
     disconnectBtn.disabled = false;
@@ -78,15 +95,15 @@ connectBtn.addEventListener('click', async () => {
 
 disconnectBtn.addEventListener('click', async () => {
   if (!servo) return;
-  
+
   try {
     await servo.disconnect();
     servo = null;
-    
+
     log('Disconnected', 'info');
     connectionStatus.textContent = 'Disconnected';
     connectionStatus.className = 'status disconnected';
-    
+
     // Update button states
     connectBtn.disabled = false;
     disconnectBtn.disabled = true;
@@ -109,20 +126,20 @@ const servoList = document.getElementById('servoList') as HTMLElement;
 
 scanBtn.addEventListener('click', async () => {
   if (!servo) return;
-  
+
   log('Scanning for servos...');
   servoList.innerHTML = '<p>Scanning...</p>';
-  
+
   try {
     const found = await servo.scan(0, 20); // Scan first 20 IDs for faster demo
-    
+
     if (found.length === 0) {
       servoList.innerHTML = '<p>No servos found</p>';
       log('No servos found', 'error');
     } else {
       log(`Found ${found.length} servo(s)`, 'success');
       servoList.innerHTML = '';
-      
+
       for (const result of found) {
         const item = document.createElement('div');
         item.className = 'servo-item';
@@ -175,7 +192,7 @@ const disableTorqueBtn = document.getElementById('disableTorqueBtn') as HTMLButt
 
 enableTorqueBtn.addEventListener('click', async () => {
   if (!servo) return;
-  
+
   const id = parseInt((document.getElementById('servoId') as HTMLInputElement).value);
   try {
     await servo.enableTorque(id);
@@ -187,7 +204,7 @@ enableTorqueBtn.addEventListener('click', async () => {
 
 disableTorqueBtn.addEventListener('click', async () => {
   if (!servo) return;
-  
+
   const id = parseInt((document.getElementById('servoId') as HTMLInputElement).value);
   try {
     await servo.disableTorque(id);
@@ -202,11 +219,11 @@ const moveBtn = document.getElementById('moveBtn') as HTMLButtonElement;
 
 moveBtn.addEventListener('click', async () => {
   if (!servo) return;
-  
+
   const id = parseInt((document.getElementById('servoId') as HTMLInputElement).value);
   const position = parseInt(positionInput.value);
   const speed = parseInt(speedInput.value);
-  
+
   try {
     await servo.writePosition(id, position, speed);
     log(`Moving servo ${id} to position ${position} at speed ${speed}`, 'success');
@@ -222,9 +239,9 @@ const statusInfo = document.getElementById('statusInfo') as HTMLElement;
 
 readStatusBtn.addEventListener('click', async () => {
   if (!servo) return;
-  
+
   const id = parseInt((document.getElementById('servoId') as HTMLInputElement).value);
-  
+
   try {
     const status = await servo.readStatus(id);
     statusDisplay.style.display = 'block';
@@ -249,7 +266,7 @@ readStatusBtn.addEventListener('click', async () => {
         <span class="info-label">Moving:</span> ${status.moving ? 'Yes' : 'No'}
       </div>
     `;
-    
+
     log(`Status read for servo ${id}`, 'success');
   } catch (error) {
     log(`Failed to read status: ${error}`, 'error');
@@ -275,16 +292,16 @@ const syncResults = document.getElementById('syncResults') as HTMLElement;
 
 syncMoveBtn.addEventListener('click', async () => {
   if (!servo) return;
-  
+
   const idsText = (document.getElementById('syncIds') as HTMLInputElement).value;
   const ids = idsText.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
   const position = parseInt(syncPositionInput.value);
-  
+
   if (ids.length === 0) {
     log('No valid servo IDs provided', 'error');
     return;
   }
-  
+
   try {
     const positions = ids.map(id => ({ id, position }));
     await servo.syncWritePosition(positions);
@@ -296,15 +313,15 @@ syncMoveBtn.addEventListener('click', async () => {
 
 syncReadBtn.addEventListener('click', async () => {
   if (!servo) return;
-  
+
   const idsText = (document.getElementById('syncIds') as HTMLInputElement).value;
   const ids = idsText.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
-  
+
   if (ids.length === 0) {
     log('No valid servo IDs provided', 'error');
     return;
   }
-  
+
   try {
     const positions = await servo.syncReadPosition(ids);
     syncResults.innerHTML = '';
@@ -317,7 +334,7 @@ syncReadBtn.addEventListener('click', async () => {
       `;
       syncResults.appendChild(item);
     }
-    
+
     log(`Read positions from ${positions.size} servos`, 'success');
   } catch (error) {
     log(`Sync read failed: ${error}`, 'error');
@@ -331,15 +348,15 @@ const factoryResetBtn = document.getElementById('factoryResetBtn') as HTMLButton
 
 changeIdBtn.addEventListener('click', async () => {
   if (!servo) return;
-  
+
   const currentId = parseInt((document.getElementById('currentId') as HTMLInputElement).value);
   const newId = parseInt((document.getElementById('newId') as HTMLInputElement).value);
-  
+
   if (isNaN(currentId) || isNaN(newId)) {
     log('Invalid ID values', 'error');
     return;
   }
-  
+
   if (confirm(`Change servo ID from ${currentId} to ${newId}?`)) {
     try {
       await servo.setID(currentId, newId);
@@ -352,14 +369,14 @@ changeIdBtn.addEventListener('click', async () => {
 
 factoryResetBtn.addEventListener('click', async () => {
   if (!servo) return;
-  
+
   const id = parseInt((document.getElementById('resetId') as HTMLInputElement).value);
-  
+
   if (isNaN(id)) {
     log('Invalid ID value', 'error');
     return;
   }
-  
+
   if (confirm(`Factory reset servo ${id}? This will reset all settings to defaults.`)) {
     try {
       await servo.factoryReset(id);

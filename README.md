@@ -217,18 +217,55 @@ Then open http://localhost:3000 in your browser.
 
 ## Development
 
+### Setup
+
 ```bash
 # Install dependencies
 npm install
 
-# Build library
-npm run build
+# Install example dependencies
+cd examples && npm install && cd ..
+```
 
+### Development Workflow
+
+When developing the SDK and testing with examples:
+
+1. **Start SDK build in watch mode** (in the root directory):
+   ```bash
+   npm run dev
+   ```
+   This watches for changes in `src/` and automatically rebuilds to `dist/`
+
+2. **In a separate terminal, run the example** (in the examples directory):
+   ```bash
+   cd examples && npm run dev
+   ```
+
+3. **Both processes must run simultaneously** for live updates:
+   - SDK changes in `src/` → automatically built to `dist/`
+   - Example imports from `dist/` → sees updates immediately
+
+### Alternative: One-time build
+```bash
+# Build once and run example
+npm run build && cd examples && npm run dev
+```
+
+### Other Commands
+
+```bash
 # Run tests
 npm run test
 
-# Run examples
-cd examples && npm run dev
+# Lint code
+npm run lint
+
+# Format code
+npm run format
+
+# Build for production
+npm run build
 ```
 
 ## Protocol Information

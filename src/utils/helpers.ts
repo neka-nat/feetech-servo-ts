@@ -1,5 +1,5 @@
 import { MIN_POSITION_VALUE, MAX_POSITION_VALUE, MIN_SPEED_VALUE, MAX_SPEED_VALUE } from '../core/constants';
-import { MODEL_RESOLUTION } from '../types';
+import { MODEL_RESOLUTION, MODEL_CONFIGS } from '../types';
 
 export function degreesToPosition(degrees: number, model: string = 'scs_series'): number {
   // Convert degrees to position value based on model resolution
@@ -24,8 +24,18 @@ export function speedToRpm(speed: number): number {
   return (speed / MAX_SPEED_VALUE) * 114;
 }
 
-export function clampPosition(position: number): number {
-  return Math.max(MIN_POSITION_VALUE, Math.min(MAX_POSITION_VALUE, position));
+export function getModelMaxPosition(model: string = 'scs_series'): number {
+  return MODEL_CONFIGS[model]?.maxPosition ?? MAX_POSITION_VALUE;
+}
+
+export function getModelMinPosition(model: string = 'scs_series'): number {
+  return MODEL_CONFIGS[model]?.minPosition ?? MIN_POSITION_VALUE;
+}
+
+export function clampPosition(position: number, model: string = 'scs_series'): number {
+  const min = getModelMinPosition(model);
+  const max = getModelMaxPosition(model);
+  return Math.max(min, Math.min(max, position));
 }
 
 export function clampSpeed(speed: number): number {
