@@ -1,5 +1,5 @@
 {
-  "name": "@feetech/servo-sdk",
+  "name": "feetech-servo-ts",
   "version": "1.0.0",
   "description": "TypeScript SDK for Feetech servo motors using Web Serial API",
   "main": "./dist/index.js",

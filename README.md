@@ -21,13 +21,13 @@ This SDK requires Web Serial API support:
 ## Installation
 
 ```bash
-npm install @feetech/servo-sdk
+npm install feetech-servo-ts
 ```
 
 ## Quick Start
 
 ```typescript
-import { FeetechServo } from '@feetech/servo-sdk';
+import { FeetechServo } from 'feetech-servo-ts';
 
 // Create servo instance
 const servo = new FeetechServo({ baudRate: 1000000 });
@@ -152,7 +152,7 @@ const data2 = syncRead.getData(2);
 ## Helper Functions
 
 ```typescript
-import { helpers } from '@feetech/servo-sdk';
+import { helpers } from 'feetech-servo-ts';
 
 // Check Web Serial support
 if (helpers.isWebSerialSupported()) {
@@ -175,7 +175,7 @@ const safeSpeed = helpers.clampSpeed(-100);       // Returns 0
 ## Error Handling
 
 ```typescript
-import { ServoError, ErrorCode } from '@feetech/servo-sdk';
+import { ServoError, ErrorCode } from 'feetech-servo-ts';
 
 try {
   await servo.connect();

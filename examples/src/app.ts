@@ -1,4 +1,4 @@
-import { FeetechServo, FeetechServoConfig, helpers, ServoError, ErrorCode, MotorModel } from '@feetech/servo-sdk';
+import { FeetechServo, FeetechServoConfig, helpers, ServoError, MotorModel } from 'feetech-servo-ts';
 
 // Global servo instance
 let servo: FeetechServo | null = null;
